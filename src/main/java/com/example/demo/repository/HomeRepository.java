@@ -1,6 +1,9 @@
 package com.example.demo.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.One;
 import org.apache.ibatis.annotations.Result;
@@ -21,13 +24,24 @@ public interface HomeRepository {
       })
 	User findUserById(Long id);
 	
+	@Select("SELECT * FROM user")
+	@Results({
+        @Result(id=true, property = "id", column = "ID"),
+        @Result(property="role", column="role",
+        one=@One(select="com.example.demo.repository.HomeRepository.findUserRoleById"))
+      })
+	List<User> fetchAllUsers();
+	
 	@Select("SELECT * FROM user_role WHERE id = #{id}")
 	UserRole findUserRoleById(Long id);
 	
 	@Delete("DELETE FROM user WHERE id = #{id}")
 	public int deleteUserById(long id);
 	
-	//@Insert("INSERT INTO student(id, name, role) VALUES (#{id}, #{name}, #{role})")
-	//public int insert(User user);
+	@Insert("INSERT INTO user(id, name, role) VALUES (#{id},#{name}, #{role.id})")
+	public int insertUser(User user);
+	
+	//@Update("Update student set name=#{name}, passport=#{passport} where id=#{id}")
+	//public int update(User user);
 
 }
